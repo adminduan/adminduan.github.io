@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+
+    <!--[if lt IE 9]>
+        <style>body {display: none; background: none !important} </style>
+        <meta http-equiv="Refresh" Content="0; url=//outdatedbrowser.com/" />
+    <![endif]-->
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="author" content="apple" />
+<meta name="baidu-site-verification" content="A7k7wfuHC9" />
+
+
+
+
+<meta name="description" content="spring 中 @validator的用法，用注解方式可以吧验证信息和业务代码很好的进行分离；推荐使用的时候不要在 方法中定义 BindingResult 用spring中的统一异常进行捕获；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring中的@validator">
+<meta property="og:url" content="http://duanlsh.xyz/2018/07/30/spring中的-validator/index.html">
+<meta property="og:site_name" content="apple">
+<meta property="og:description" content="spring 中 @validator的用法，用注解方式可以吧验证信息和业务代码很好的进行分离；推荐使用的时候不要在 方法中定义 BindingResult 用spring中的统一异常进行捕获；">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-29T18:02:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring中的@validator">
+<meta name="twitter:description" content="spring 中 @validator的用法，用注解方式可以吧验证信息和业务代码很好的进行分离；推荐使用的时候不要在 方法中定义 BindingResult 用spring中的统一异常进行捕获；">
+
+<link rel="apple-touch-icon" href= "/apple-touch-icon.png">
+
+
+    <link rel="alternate" href="/atom.xml" title="apple" type="application/atom+xml">
+
+
+
+    <link rel="shortcut icon" href="/favicon.icon">
+
+
+
+    <link href="//cdn.bootcss.com/animate.css/3.5.1/animate.min.css" rel="stylesheet">
+
+
+
+    <link href="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.css" rel="stylesheet">
+
+
+
+    <script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+    <link href="//cdn.bootcss.com/pace/1.0.2/themes/blue/pace-theme-minimal.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+
+
+<title>spring中的@validator | apple</title>
+
+<script src="//cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+<script src="//cdn.bootcss.com/clipboard.js/1.5.10/clipboard.min.js"></script>
+
+<script>
+    var yiliaConfig = {
+        fancybox: true,
+        animate: true,
+        isHome: false,
+        isPost: true,
+        isArchive: false,
+        isTag: false,
+        isCategory: false,
+        fancybox_js: "//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.min.js",
+        scrollreveal: "//cdn.bootcss.com/scrollReveal.js/3.1.4/scrollreveal.min.js",
+        search: true
+    }
+</script>
+
+
+    <script> yiliaConfig.jquery_ui = [false]; </script>
+
+
+
+    <script> yiliaConfig.rootUrl = "\/";</script>
+
+
+
+
+
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "//hm.baidu.com/hm.js?3698022d7b280b63aed0958b5a7cd0e2";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            <img src="/img/header.jpeg" class="animated zoomIn">
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">apple</a></h1>
+        </hgroup>
+
+        
+        <p class="header-subtitle">每天进步一点点，专注于后端技术的学习，总结！</p>
+        
+
+        
+            <form id="search-form">
+            <input type="text" id="local-search-input" name="q" placeholder="search..." class="search form-control" autocomplete="off" autocorrect="off" searchonload="false" />
+            <i class="fa fa-times" onclick="resetSearch()"></i>
+            </form>
+            <div id="local-search-result"></div>
+            <p class='no-result'>No results found <i class='fa fa-spinner fa-pulse'></i></p>
+        
+
+
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/">主页</a></li>
+                        
+                            <li><a href="/archives/">所有文章</a></li>
+                        
+                            <li><a href="/tags/">标签云</a></li>
+                        
+                            <li><a href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" href="mailto:&#100;&#117;&#97;&#110;&#95;&#108;&#111;&#110;&#103;&#115;&#104;&#97;&#110;&#64;&#49;&#50;&#54;&#46;&#99;&#111;&#109;" title="Email"></a>
+                            
+                                <a class="fa 新浪微博" href="/sina weibo" title="新浪微博"></a>
+                            
+                                <a class="fa GitHub" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/logger/">logger</a></li></ul>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://hexo.io">Hexo</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="https://pages.github.com/">GitHub</a>
+                    
+                      <a class="main-nav-link switch-friends-link" href="http://moxfive.xyz/">MOxFIVE</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">专注于后端</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">apple</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                <img src="/img/header.jpeg" class="animated zoomIn">
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">apple</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">每天进步一点点，专注于后端技术的学习，总结！</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/">主页</a></li>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/tags/">标签云</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fa Email" target="_blank" href="mailto:&#100;&#117;&#97;&#110;&#95;&#108;&#111;&#110;&#103;&#115;&#104;&#97;&#110;&#64;&#49;&#50;&#54;&#46;&#99;&#111;&#109;" title="Email"></a>
+                            
+                                <a class="fa 新浪微博" target="_blank" href="/sina weibo" title="新浪微博"></a>
+                            
+                                <a class="fa GitHub" target="_blank" href="#" title="GitHub"></a>
+                            
+                                <a class="fa RSS" target="_blank" href="/atom.xml" title="RSS"></a>
+                            
+                        </ul>
+            </nav>
+        </header>                
+    </div>
+    <link class="menu-list" tags="标签" friends="友情链接" about="关于我"/>
+</nav>
+      <div class="body-wrap"><article id="post-spring中的-validator" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2018/07/30/spring中的-validator/" class="article-date">
+      <time datetime="2018-07-29T17:59:33.000Z" itemprop="datePublished">2018-07-30</time>
+</a>
+
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      spring中的@validator
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <excerpt in="" index="" |="" 首页摘要="">
+
+<p> spring 中 @validator的用法，用注解方式可以吧验证信息和业务代码很好的进行分离；推荐使用的时候不要在 方法中定义 <code>BindingResult</code> 用spring中的统一异常进行捕获；<br> <a id="more"></a></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h3 id="当前使用版本"><a href="#当前使用版本" class="headerlink" title="当前使用版本"></a>当前使用版本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">  &lt;groupId&gt;org.hibernate&lt;/groupId&gt;</span><br><span class="line">  &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;</span><br><span class="line">  &lt;version&gt;6.0.9.Final&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="内容介绍"><a href="#内容介绍" class="headerlink" title="内容介绍"></a>内容介绍</h3><blockquote>
+<p>@Validator注解表示对当前参数的约束生效<br>常用的约束注解为<br>@NotNull 表示的对象不能为null<br>@Null 表示的对象只能为null<br>@NotEmpty  对于字符串表示的是不能为空字符串，对于数组表示的是不能为空数组<br>@NotBlank 表示的是 字符串 去掉所有空格 类似str.trim() 以后不能为空和null<br>@Min 如果为字符串表示的是 字符串的长度，如果为数字表示的是数字的大小，如果为list表示的是list的最小长度<br>@Size 如果为字符串表示的是 字符串的长度，如果为数字表示的是数字的大小，如果为list表示的是list的最小长度<br>@Max 如果为字符串表示的是 字符串的长度，如果为数字表示的是数字的大小，如果为list表示的是list的最小长度  </p>
+</blockquote>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><h4 id="手动捕获异常"><a href="#手动捕获异常" class="headerlink" title="手动捕获异常"></a>手动捕获异常</h4><blockquote>
+<p>其中@Validated 作用到类<code>ValidUserBo</code> 上表示对<code>ValidUserBo</code> 中的参数<code>name</code>进行验证不能为空，如果为空，则 <code>result.hasErrors()</code> 中则显示存在异常信息, 如果方法中定义啦 <code>BindingResult</code> 类，则不会抛出异常；每个方法中都要进行处理；不推荐使用  </p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">public class ValidUserBo &#123;</span><br><span class="line">    @NotNull(message = &quot;name 不能为null&quot;)</span><br><span class="line">    private String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> @GetMapping(&quot;/get/valid&quot;)</span><br><span class="line">    public ResponseVO valid(@Validated ValidUserBo validUserBo, BindingResult result) &#123;</span><br><span class="line">        if (result.hasErrors()) &#123;</span><br><span class="line">            throw new IllegalArgumentException(&quot;验证异常&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return ResponseUtil.success();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h4 id="自动捕获异常"><a href="#自动捕获异常" class="headerlink" title="自动捕获异常"></a>自动捕获异常</h4><blockquote>
+<p>在方法中，不定义 <code>BindingResult</code> 则会吧异常进行抛出，然后用 <code>spring</code> 统一异常进行处理</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">public class ValidUserBo &#123;</span><br><span class="line">    @NotNull(message = &quot;name 不能为null&quot;)</span><br><span class="line">    private String name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> @GetMapping(&quot;/get/valid&quot;)</span><br><span class="line">    public ResponseVO valid(@Validated ValidUserBo validUserBo) &#123;</span><br><span class="line">        return ResponseUtil.success();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">//统一异常处理</span><br><span class="line">@RestControllerAdvice</span><br><span class="line">public class GlobalExceptionHandler &#123;</span><br><span class="line"></span><br><span class="line">    @ExceptionHandler(value = BindException.class)</span><br><span class="line">    public ResponseVO personException(BindException e)&#123;</span><br><span class="line">        log.info(&quot;GlobalExceptionHandler.personException &quot;, e);</span><br><span class="line"></span><br><span class="line">        return ResponseUtil.fail(.getFieldError().getDefaultMessage());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@Builder</span><br><span class="line">@AllArgsConstructor</span><br><span class="line">@Getter</span><br><span class="line">@Setter</span><br><span class="line">public class ResponseVO&lt;T&gt; &#123;</span><br><span class="line">    private int code;</span><br><span class="line">    private String message;</span><br><span class="line">    private T obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="指定参数验证"><a href="#指定参数验证" class="headerlink" title="指定参数验证"></a>指定参数验证</h4><blockquote>
+<p>对于指定使用参数验证，要使用到的是 <code>@Validated(ValidUserBo.Name.class)</code> 模式，此处验证的是 <code>group</code> 为 <code>Name</code> 类的参数才进行验证；</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">public class ValidUserBo &#123;</span><br><span class="line">    @NotNull(message = &quot;name 不能为null&quot;, groups = &#123;Name.class&#125;)</span><br><span class="line">    private String name;</span><br><span class="line">    </span><br><span class="line">    @NotNull(message = &quot;name1 不能为null&quot;)</span><br><span class="line">    private String name1;</span><br><span class="line">    </span><br><span class="line">    public interface Name&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//使用方式：</span><br><span class="line">@GetMapping(&quot;/get/valid&quot;)</span><br><span class="line">    public ResponseVO valid(@Validated(ValidUserBo.Name.class) ValidUserBo validUserBo) &#123;</span><br><span class="line">        return ResponseUtil.success();</span><br><span class="line">&#125;</span><br><span class="line">//此时验证的时候，只会验证 name不能为空，而name1 则不进行任何验证;</span><br></pre></td></tr></table></figure>
+<h4 id="自定义-验证"><a href="#自定义-验证" class="headerlink" title="自定义 验证"></a>自定义 验证</h4><p><em>定义注解：</em>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Documented</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(&#123;ElementType.METHOD, ElementType.FIELD, ElementType.TYPE&#125;)</span><br><span class="line">@Constraint(validatedBy = CheckSql.class)  //表示对应约束的类</span><br><span class="line">public @interface PhoneNo &#123;</span><br><span class="line"></span><br><span class="line">    String message() default &quot;手机号码无效&quot;;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt;[] groups() default &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    Class&lt;? extends Payload&gt;[] payload() default &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>定义类信息：</em></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//注解两个参数 第一个表示的是，当前注解，第二个表示的是，定义到的字段  </span><br><span class="line">public class CheckSql implements ConstraintValidator&lt;PhoneNo, String&gt; &#123; </span><br><span class="line">    @Override</span><br><span class="line">    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) &#123;</span><br><span class="line">        if (s .equals(&quot;187&quot;)) &#123;</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">        return false;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">*用法：*</span><br></pre></td></tr></table></figure>
+<p>public class ValidUserBo {<br>    @PhoneNo(message = “号码有误”, groups = {Name.class})<br>    public String phone;<br>    public interface Name{}<br>}<br>```</p>
+</the></excerpt>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2018/07/30/spring中的-validator/">spring中的@validator</a></p>
+        <p><span>文章作者:</span><a href="/" title="回到主页">apple</a></p>
+        <p><span>发布时间:</span>2018-07-30, 01:59:33</p>
+        <p><span>最后更新:</span>2018-07-30, 02:02:06</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/07/30/spring中的-validator/" title="spring中的@validator">http://duanlsh.xyz/2018/07/30/spring中的-validator/</a>
+            <span class="copy-path" data-clipboard-text="原文: http://duanlsh.xyz/2018/07/30/spring中的-validator/　　作者: apple" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" title="CC BY-NC-SA 4.0 International" target = "_blank">"apple -非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+    <nav id="article-nav">
+        
+        
+            <div id="article-nav-older" class="article-nav-title">
+                <a href="/2018/07/20/logback-mdc/">
+                    logback-mdc
+                </a>
+            </div>
+        
+    </nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+        <strong class="toc-title">文章目录</strong>
+        
+            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#当前使用版本"><span class="toc-number">1.</span> <span class="toc-text"><a href="#&#x5F53;&#x524D;&#x4F7F;&#x7528;&#x7248;&#x672C;" class="headerlink" title="&#x5F53;&#x524D;&#x4F7F;&#x7528;&#x7248;&#x672C;"></a>&#x5F53;&#x524D;&#x4F7F;&#x7528;&#x7248;&#x672C;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内容介绍"><span class="toc-number">2.</span> <span class="toc-text"><a href="#&#x5185;&#x5BB9;&#x4ECB;&#x7ECD;" class="headerlink" title="&#x5185;&#x5BB9;&#x4ECB;&#x7ECD;"></a>&#x5185;&#x5BB9;&#x4ECB;&#x7ECD;</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用方式"><span class="toc-number">3.</span> <span class="toc-text"><a href="#&#x4F7F;&#x7528;&#x65B9;&#x5F0F;" class="headerlink" title="&#x4F7F;&#x7528;&#x65B9;&#x5F0F;"></a>&#x4F7F;&#x7528;&#x65B9;&#x5F0F;</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#手动捕获异常"><span class="toc-number">3.1.</span> <span class="toc-text"><a href="#&#x624B;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;" class="headerlink" title="&#x624B;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;"></a>&#x624B;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#自动捕获异常"><span class="toc-number">3.2.</span> <span class="toc-text"><a href="#&#x81EA;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;" class="headerlink" title="&#x81EA;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;"></a>&#x81EA;&#x52A8;&#x6355;&#x83B7;&#x5F02;&#x5E38;</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#指定参数验证"><span class="toc-number">3.3.</span> <span class="toc-text"><a href="#&#x6307;&#x5B9A;&#x53C2;&#x6570;&#x9A8C;&#x8BC1;" class="headerlink" title="&#x6307;&#x5B9A;&#x53C2;&#x6570;&#x9A8C;&#x8BC1;"></a>&#x6307;&#x5B9A;&#x53C2;&#x6570;&#x9A8C;&#x8BC1;</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#自定义-验证"><span class="toc-number">3.4.</span> <span class="toc-text"><a href="#&#x81EA;&#x5B9A;&#x4E49;-&#x9A8C;&#x8BC1;" class="headerlink" title="&#x81EA;&#x5B9A;&#x4E49; &#x9A8C;&#x8BC1;"></a>&#x81EA;&#x5B9A;&#x4E49; &#x9A8C;&#x8BC1;</span></a></li></ol></li></ol>
+        
+    </div>
+    <style>
+        .left-col .switch-btn,
+        .left-col .switch-area {
+            display: none;
+        }
+        .toc-level-3 i,
+        .toc-level-3 ol {
+            display: none !important;
+        }
+    </style>
+
+    <input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+    <script>
+        yiliaConfig.toc = ["隐藏目录", "显示目录", !!"false"];
+    </script>
+
+
+
+    
+<div class="share">
+    
+        <div class="bdsharebuttonbox">
+            <a href="#" class="fa fa-twitter bds_twi" data-cmd="twi" title="分享到推特"></a>
+            <a href="#" class="fa fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+            <a href="#" class="fa fa-qq bds_sqq" data-cmd="sqq" title="分享给 QQ 好友"></a>
+            <a href="#" class="fa fa-files-o bds_copy" data-cmd="copy" title="复制网址"></a>
+            <a href="#" class="fa fa fa-envelope-o bds_mail" data-cmd="mail" title="通过邮件分享"></a>
+            <a href="#" class="fa fa-weixin bds_weixin" data-cmd="weixin" title="生成文章二维码"></a>
+            <a href="#" class="fa fa-share-alt bds_more" data-cmd="more"></i></a>
+        </div>
+        <script>
+            window._bd_share_config={
+                "common":{"bdSnsKey":{},"bdText":"spring中的@validator　| apple　","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];
+        </script>
+    
+
+    
+</div>
+
+
+
+
+
+
+
+    
+
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+
+        
+            <a href="/2018/07/20/logback-mdc/" title="下一篇: logback-mdc">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/07/30/spring中的-validator/">spring中的@validator</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/20/logback-mdc/">logback-mdc</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/07/18/logback/">logback</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/12/07/hexoduan/">hexoduan</a></li></ul>
+
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                <i class="fa fa-copyright"></i> 
+                2017-2018 apple
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank" title="快速、简洁且高效的博客框架">Hexo</a>  Theme <a href="https://github.com/MOxFIVE/hexo-theme-yelee" target="_blank" title="简而不减 Hexo 双栏博客主题  v3.5">Yelee</a> by MOxFIVE duan <i class="fa fa-heart animated infinite pulse"></i>
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" title="本站到访数"><i class="fa fa-user" aria-hidden="true"></i><span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>| </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit"  title="本页阅读量"><i class="fa fa-eye animated infinite pulse" aria-hidden="true"></i><span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+    </div>
+    
+<script data-main="/js/main.js" src="//cdn.bootcss.com/require.js/2.2.0/require.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var iPad = window.navigator.userAgent.indexOf('iPad');
+            if (iPad > -1 || $(".left-col").css("display") === "none") {
+                var bgColorList = ["#9db3f4", "#414141", "#e5a859", "#f5dfc6", "#c084a0", "#847e72", "#cd8390", "#996731"];
+                var bgColor = Math.ceil(Math.random() * (bgColorList.length - 1));
+                $("body").css({"background-color": bgColorList[bgColor], "background-size": "cover"});
+            }
+            else {
+                var backgroundnum = 5;
+                var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+                $("body").css({"background": backgroundimg, "background-attachment": "fixed", "background-size": "cover"});
+            }
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#" title="返回顶部"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments" onclick="load$hide();" title="查看评论"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer" title="转到底部"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    // Open in New Window
+    
+        var oOpenInNew = {
+            
+            
+            
+            
+            
+            
+             archives: ".archive-article-title", 
+             miniArchives: "a.post-list-link", 
+            
+             friends: "#js-friends a", 
+             socail: ".social a" 
+        }
+        for (var x in oOpenInNew) {
+            $(oOpenInNew[x]).attr("target", "_blank");
+        }
+    
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+  </div>
+</body>
+</html>
